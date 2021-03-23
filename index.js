@@ -68,8 +68,9 @@ function drawChess (x, y) {
 }
 
 function judge (x, y) {
-  const scope = CHESS_POINT_COUNT - RESULT_COUNT;
-
+  const endScope = CHESS_POINT_COUNT - RESULT_COUNT;
+  const startScope = (point) => point < 5;
+  const xStartScope = startScope(x);
   if (x <= scope) {
     forData(x, y, to_X);
   }
