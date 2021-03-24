@@ -91,7 +91,9 @@ function drawChess (x, y) {
 function judge (x, y) {
   // 计算x轴
   forData(x, y, to_X, toX);
+  // 计算y
   forData(x, y, to_Y, toY);
+  // 计算斜线
   forData(x, y, to_XY, toX_Y);
   forData(x, y, toXY, to_X_Y);
 }
