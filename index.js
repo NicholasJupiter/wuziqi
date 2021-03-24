@@ -1,5 +1,6 @@
 const CHESS_POINT_COUNT = 15;
 const RESULT_COUNT = 5; // 获胜需要几个棋子
+let isVictory = false;
 
 // 数据
 const DATA = initData();
@@ -8,6 +9,7 @@ function initData () {
   return Array.from({ length: CHESS_POINT_COUNT }).
     fill(0).map(() => Array.from({ length: CHESS_POINT_COUNT }).fill(-1));
 }
+
 
 // 如何移动
 // 水平移动
@@ -21,19 +23,25 @@ const toXY = [1, 1];
 const to_X_Y = [-1, -1];
 const to_XY = [-1, 1];
 const toX_Y = [1, -1];
+
 // canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 // 当前操作者
-let currState = true; // true: black false: white
+var currState = true; // true: black false: white
+let lastStep = []; // 最后一步
+
+// const huiqiStep = {
+//   black: true,
+//   white: true,
+// }
 
 // img 
 const img_b = new Image();
 img_b.src = "black.png";//白棋图片
 const img_w = new Image();
 img_w.src = "white.png";//黑棋图片
-
 
 
 function init () {
@@ -47,6 +55,7 @@ function init () {
     ctx.lineTo(715, 15 + i * 50);
     ctx.stroke();
   }
+  canvas.addEventListener('mousedown', play);
 }
 
 // 下棋
@@ -60,43 +69,70 @@ function drawChess (x, y) {
   if (DATA[y][x] !== -1) {
     return alert('已经有棋子了');
   }
+  // const state = currState ? 'black' : 'white';
+  // if (!huiqiStep[state]) {
+  //   document.getElementById('huiqi').style.display = 'none';
+  // } else {
+  //   document.getElementById('huiqi').style.display = 'inline-block';
+  // }
+  // lastStep = [y, x];
   const currImg = currState ? img_b : img_w;
   ctx.drawImage(currImg, x * 50, y * 50);
   DATA[y][x] = currState;
   judge(x, y);
+  if (isVictory) {
+    setTimeout(() => { alert(currState ? '黑方胜利' : '白方胜利'); }, 100);
+    canvas.removeEventListener('mousedown', play);
+    return;
+  }
   currState = !currState;
 }
 
 function judge (x, y) {
-  const endScope = CHESS_POINT_COUNT - RESULT_COUNT;
-  const startScope = (point) => point < 5;
-  const xStartScope = startScope(x);
-  if (x <= scope) {
-    forData(x, y, to_X);
-  }
-  if (x >= scope) {
-
-  }
-  if (x !== CHESS_POINT_COUNT - 1) {
-    forData(x, y, toX);
-  }
-  if (y < RESULT_COUNT) {
-    // forData(x, y, to);
-  }
+  // 计算x轴
+  forData(x, y, to_X, toX);
+  forData(x, y, to_Y, toY);
+  forData(x, y, to_XY, toX_Y);
+  forData(x, y, toXY, to_X_Y);
 }
-
-function forData (x, y, step) {
-  const [_x, _y] = step;
+/**
+ * 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {*} step1 
+ * @param {*} step2 
+ * @returns 
+ */
+function forData (x, y, step1, step2) {
+  const [_x, _y] = step1;
+  const [_x2, _y2] = step2;
   let res = 1;
+  let currX = x;
+  let currY = y;
   for (let i = 0; i < RESULT_COUNT; i++) {
-    if (dataJudge(x, y, step) !== currState) {
+    if (dataJudge(currX, currY, step1) !== currState ||
+      (x < 0 || y < 0 || x >= CHESS_POINT_COUNT || y >= CHESS_POINT_COUNT)) {
       break;
     };
     ++res;
-    x = x + _x;
-    y = y + _y;
+    currX = currX + _x;
+    currY = currY + _y;
   }
-  console.log(res);
+  currX = x;
+  currY = y;
+  for (let i = 0; i < RESULT_COUNT; i++) {
+    if (dataJudge(currX, currY, step2) !== currState ||
+      (x < 0 || y < 0 || x >= CHESS_POINT_COUNT || y >= CHESS_POINT_COUNT)) {
+      break;
+    };
+    ++res;
+    currX = currX + _x2;
+    currY = currY + _y2;
+  }
+  if (res >= RESULT_COUNT) {
+    isVictory = true;
+  }
+  return res;
 }
 
 function dataJudge (x, y, step) {
@@ -104,5 +140,13 @@ function dataJudge (x, y, step) {
   return DATA[y + _y][x + _x];
 }
 
+// function huiqi () {
+//   const state = currState ? 'black' : 'white';
+//   huiqiStep[state] = false;
+// }
+
+function reload () {
+  location.reload();
+}
 
 init();

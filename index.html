@@ -15,12 +15,28 @@
       margin: 10vh auto 0;
       display: block;
     }
+
+    .btns {
+      text-align: center;
+    }
+
+    button {
+      padding: 4px 10px;
+      margin: 0 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
   </style>
 </head>
 
 <body>
-  <canvas width="750" height="750" id="canvas" onmousedown="play(event)"></canvas>
+  <canvas width="750" height="750" id="canvas"></canvas>
 
+  <div class="btns">
+    <button onclick="reload()" id="reload">重新开始</button>
+    <!-- <button onclick="huiqi()" id="huiqi">悔棋</button> -->
+  </div>
 </body>
 
 
